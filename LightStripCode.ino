@@ -296,13 +296,13 @@ void ColorWipe()
   {
     strip.setPixelColor(i, color);
     strip.show();
-    delay(100);
+    delay(25);
   }
   for (int i = 0; i < strip.numPixels(); i++)
   {
     strip.setPixelColor(i, offColor);
     strip.show();
-    delay(100);
+    delay(25);
   }
 }
 
