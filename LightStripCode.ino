@@ -13,10 +13,10 @@ int nLEDs = 24;
 int dataPin  = 2;
 //int clockPin = 3;
 
-const bool IS_ROBOT_FOR_COMPETITION = true;
+const bool IS_ROBOT_FOR_COMPETITION = false;
 
 //Number of LEDs, data pin, 800KHz with GRB wiring
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(nLEDs, dataPin, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(nLEDs, dataPin, NEO_RGB + NEO_KHZ800);
 
 
 void setup()
@@ -31,7 +31,9 @@ void setup()
   // Update the strip, to start they are all 'off'
   strip.show();
 
-  pinMode(5, INPUT); //Alliance Color Data
+  pinMode(3, INPUT); //Alliance Color Data
+  pinMode(4, INPUT); //Color Switch 1 - Alliance color or green
+  pinMode(5, INPUT); //Color Switch 2 - Red or blue
   pinMode(6, INPUT); //Mode Switch 1 - Chase effects or others
   pinMode(7, INPUT); //Mode Switch 2 - Rainbow effects or misc
   pinMode(8, INPUT); //Method Switch 1 - 1st in group or others
@@ -42,6 +44,25 @@ void loop()
 {
   if(IS_ROBOT_FOR_COMPETITION)
   {
+    if(digitalRead(3) == HIGH) //Colors
+    {
+      if(digitalRead(4) == HIGH)
+      {
+        //Alliance color
+        if(digitalRead(5) == HIGH)
+        {
+          Solid(255, 0, 0);
+        }
+        else
+        {
+          Solid(0, 0, 255);
+        }
+      }
+      else
+      {
+        Solid(0, 255, 0);
+      }
+    }
     if (digitalRead(6) == HIGH) //Chase effects
     {
       if (digitalRead(8) == HIGH)
@@ -91,7 +112,17 @@ void loop()
   else
   {
     //not competition. choose your most favorite effect(s)
+    Solid(0, 255, 0);
   }
+}
+
+void Solid(byte r, byte g, byte b)
+{
+  for(int i = 0; i < strip.numPixels(); i++)
+  {
+    strip.setPixelColor(i, strip.Color(g, r, b));
+  }
+  strip.show();
 }
 
 void NightRider()
@@ -374,6 +405,7 @@ void ColorFade(byte* off, byte* on)
     {
       strip.setPixelColor(i, colorLerp(off, on, q));
     }
+    strip.show();
     delay(1000 / 30.0f);
   }
 }
