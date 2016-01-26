@@ -1,4 +1,4 @@
-#include <Arduino_Neopixel.h>
+#include <Adafruit_NeoPixel.h>
 #include "SPI.h" // Comment out this line if using Trinket or Gemma
 #ifdef __AVR_ATtiny85__
 #include <avr/power.h>
@@ -16,7 +16,7 @@ int dataPin  = 2;
 const bool IS_ROBOT_FOR_COMPETITION = true;
 
 //Number of LEDs, data pin, 800KHz with GRB wiring
-Arduino_NeoPixel strip = Arduino_NeoPixel(nLEDs, dataPin, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(nLEDs, dataPin, NEO_GRB + NEO_KHZ800);
 
 
 void setup()
