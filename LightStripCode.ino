@@ -16,7 +16,7 @@ int dataPin  = 2;
 const bool IS_ROBOT_FOR_COMPETITION = false;
 
 //Number of LEDs, data pin, 800KHz with GRB wiring
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(nLEDs, dataPin, NEO_RGB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(nLEDs, dataPin, NEO_GRB + NEO_KHZ800);
 
 
 void setup()
@@ -31,11 +31,10 @@ void setup()
   // Update the strip, to start they are all 'off'
   strip.show();
 
-  pinMode(3, INPUT); //Alliance Color Data
-  pinMode(4, INPUT); //Color Switch 1 - Alliance color or green
-  pinMode(5, INPUT); //Color Switch 2 - Red or blue
-  pinMode(6, INPUT); //Mode Switch 1 - Chase effects or others
-  pinMode(7, INPUT); //Mode Switch 2 - Rainbow effects or misc
+  pinMode(4, INPUT); //Alliance Color Data
+  pinMode(5, INPUT); //Color Switch 1 - Alliance color or green
+  pinMode(6, INPUT); //Color Switch 2 - Red or blue
+  pinMode(7, INPUT); //Mode Switch - Rainbow effects or misc
   pinMode(8, INPUT); //Method Switch 1 - 1st in group or others
   pinMode(9, INPUT); //Method Switch 2 - 2nd in group or 3rd
 }
@@ -44,12 +43,12 @@ void loop()
 {
   if(IS_ROBOT_FOR_COMPETITION)
   {
-    if(digitalRead(3) == HIGH) //Colors
+    if(digitalRead(4) == HIGH) //Colors
     {
-      if(digitalRead(4) == HIGH)
+      if(digitalRead(5) == HIGH)
       {
         //Alliance color
-        if(digitalRead(5) == HIGH)
+        if(digitalRead(6) == HIGH)
         {
           Solid(255, 0, 0);
         }
@@ -63,28 +62,9 @@ void loop()
         Solid(0, 255, 0);
       }
     }
-    if (digitalRead(6) == HIGH) //Chase effects
-    {
-      if (digitalRead(8) == HIGH)
-      {
-        NightRider();
-      }
-      else if (digitalRead(9) == HIGH)
-      {
-        ColorChase();
-      }
-      else
-      {
-        FadeChase();
-      }
-    }
     else if (digitalRead(7) == HIGH) //Rainbow effects
     {
       if (digitalRead(8) == HIGH)
-      {
-        RainbowChase();
-      }
-      else if (digitalRead(9) == HIGH)
       {
         RainbowFade();
       }
@@ -95,13 +75,9 @@ void loop()
     }
     else //Misc effects
     {
-      if (digitalRead(8) == HIGH)
+      if (digitalRead(9) == HIGH)
       {
         TheaterCrawl();
-      }
-      else if (digitalRead(9) == HIGH)
-      {
-        ColorWipe();
       }
       else
       {
@@ -112,7 +88,7 @@ void loop()
   else
   {
     //not competition. choose your most favorite effect(s)
-    Solid(0, 255, 0);
+    RainbowFade();
   }
 }
 
@@ -120,115 +96,9 @@ void Solid(byte r, byte g, byte b)
 {
   for(int i = 0; i < strip.numPixels(); i++)
   {
-    strip.setPixelColor(i, strip.Color(g, r, b));
+    strip.setPixelColor(i, strip.Color(r, g, b));
   }
   strip.show();
-}
-
-void NightRider()
-{
-  byte* offColor = getOffColor();
-  byte* color = getOnColor();
-  for (int i = 0; i < strip.numPixels(); i++)
-  {
-    strip.setPixelColor(i, getColor(offColor));
-  }
-  strip.show();
-  for (int i = 0; i < strip.numPixels(); i++)
-  {
-    strip.setPixelColor(i, getColor(color)); // Set new pixel 'on'
-    strip.show();
-    delay(25);
-    for (int j = 0; j <= 2; j++)
-    {
-      strip.setPixelColor(i - j, colorLerp(color, offColor, 1.0f / 3.0f * (j + 1)));
-    }
-    strip.show();
-  }
-  for (int i = strip.numPixels() - 1; i >= 0; i--)
-  {
-    strip.setPixelColor(i, getColor(color)); // Set new pixel 'on'
-    strip.show();
-    delay(25);
-    for (int j = 0; j <= 2; j++)
-    {
-      strip.setPixelColor(i + j, colorLerp(color, offColor, 1.0f / 3.0f * (j + 1)));
-    }
-    strip.show();
-  }
-}
-
-void ColorChase()
-{
-  byte* offColor = getOffColor();
-  byte* color = getOnColor();
-  for (int i = 0; i < strip.numPixels(); i++)
-  {
-    strip.setPixelColor(i, getColor(offColor));
-  }
-  strip.show();
-  for (int i = 0; i < strip.numPixels() + 2; i++)
-  {
-    strip.setPixelColor(i, getColor(color)); // Set new pixel 'on'
-    strip.show();
-    delay(25);
-    for (int j = 0; j <= 2; j++)
-    {
-      strip.setPixelColor(i - j, colorLerp(color, offColor, 1.0f / 3.0f * (j + 1)));
-    }
-    strip.show();
-  }
-}
-
-void FadeChase()
-{
-  byte* offColor = getOffColor();
-  byte* color = getOnColor();
-  for (int i = 0; i < strip.numPixels(); i++)
-  {
-    strip.setPixelColor(i, getColor(offColor));
-  }
-  strip.show();
-  for (int j = -strip.numPixels(); j < strip.numPixels(); j++)
-  {
-    for (int i = 0; i < strip.numPixels(); i++)
-    {
-      strip.setPixelColor(i + j, colorLerp(color, offColor, (double)i / strip.numPixels() / 2));
-    }
-    strip.show();
-    delay(50 / strip.numPixels());
-  }
-  for (int j = -strip.numPixels(); j < strip.numPixels(); j++)
-  {
-    for (int i = 0; i < strip.numPixels(); i++)
-    {
-      strip.setPixelColor(i + j, colorLerp(offColor, color, (double)i / strip.numPixels() / 2));
-    }
-    strip.show();
-    delay(50 / strip.numPixels());
-  }
-}
-
-void RainbowChase()
-{
-  byte* offColor = getOffColor();
-  byte* color = getOnColor();
-  for (int i = 0; i < strip.numPixels(); i++)
-  {
-    strip.setPixelColor(i, getColor(offColor));
-  }
-  strip.show();
-  for (int i = 0; i < strip.numPixels(); i++)
-  {
-    strip.setPixelColor(i, Wheel(i * (384 / strip.numPixels()))); // Set new pixel 'on'
-    strip.show();
-    delay(25);
-    for (int j = 0; j <= 2; j++)
-    {
-      strip.setPixelColor(i - j, colorLerp(WheelBytes((i - j) * (384 / strip.numPixels())), offColor, 1.0f / 3.0f * (j + 1)));
-    }
-    strip.show();
-  }
 }
 
 void RainbowFade()
@@ -246,49 +116,40 @@ void RainbowFade()
 
 void TasteTheRainbow()
 {
-  byte* offColor = getOffColor();
-  byte* color = getOnColor();
-  for (int i = 0; i < strip.numPixels(); i++)
+  uint32_t offColor = getOffColor();
+  int offset = 3;
+  int wheelInc = 384 / (strip.numPixels() + offset);
+  /*for (int i = 0; i < strip.numPixels(); i++)
   {
-    strip.setPixelColor(i, getColor(offColor));
+    strip.setPixelColor(i, offColor);
   }
-  strip.show();
-  for (int i = 0; i < strip.numPixels(); i++)
-  {
-    strip.setPixelColor(i, Wheel(i * (384 / strip.numPixels())));
-    strip.show();
-    delay(100 / (strip.numPixels() / 5));
-  }
-  for (int j = 0; j < 10; j++)
+  strip.show();*/
+  for (int executions = 0; executions < strip.numPixels() / offset + 1; executions++)
   {
     for (int i = 0; i < strip.numPixels(); i++)
     {
-      strip.setPixelColor(i, colorLerp(WheelBytes(i * (384 / strip.numPixels())), offColor, 1.0f / 10.0f * (j + 1)));
+      int totalDistance = i + executions * offset;
+      strip.setPixelColor(loopI(totalDistance), Wheel(i * wheelInc));
+      strip.show();
+      delay(100 / (strip.numPixels() / 5));
     }
-    strip.show();
-    delay(10 / (strip.numPixels() / 5));
   }
-  for (int i = strip.numPixels() - 1; i >= 0; i--)
+}
+
+int loopI(int i)
+{
+  int k = i / strip.numPixels();
+  if(k > 0)
   {
-    strip.setPixelColor(i, Wheel(i * (384 / strip.numPixels())));
-    strip.show();
-    delay(100 / (strip.numPixels() / 5));
+    return i - (k * strip.numPixels()) - k;
   }
-  for (int j = 0; j < 10; j++)
-  {
-    for (int i = 0; i < strip.numPixels(); i++)
-    {
-      strip.setPixelColor(i, colorLerp(WheelBytes(i * (384 / strip.numPixels())), offColor, 1.0f / 10.0f * (j + 1)));
-    }
-    strip.show();
-    delay(10 / (strip.numPixels() / 5));
-  }
+  return i;
 }
 
 void TheaterCrawl()
 {
-  uint32_t offColor = getColor(getOffColor());
-  uint32_t color = getColor(getOnColor());
+  uint32_t color = getColor(255,0,0);
+  uint32_t offColor = getColor(0,0,0);
   for (int i = 0; i < strip.numPixels(); i++)
   {
     strip.setPixelColor(i, offColor);
@@ -311,8 +172,8 @@ void TheaterCrawl()
 
 void ColorWipe()
 {
-  uint32_t offColor = getColor(getOffColor());
-  uint32_t color = getColor(getOnColor());
+  uint32_t color = getColor(255,0,0);
+  uint32_t offColor = getColor(0,0,0);
   for (int i = 0; i < strip.numPixels(); i++)
   {
     strip.setPixelColor(i, offColor);
@@ -342,45 +203,33 @@ void GreenBluePurple()
   ColorFade(purple, green);
 }
 
-uint32_t getColor(byte* color)
+uint32_t getColor(byte r, byte g, byte b)
 {
-  return strip.Color(color[0], color[1], color[2]);
+  return strip.Color(r, g, b);
 }
 
-byte* getOnColor()
+uint32_t getOnColor()
 {
   if (IS_ROBOT_FOR_COMPETITION)
   {
     if (digitalRead(5) == HIGH) //red alliance
     {
-      byte bytes[] = {255, 0, 0};
-      return bytes;
+      return strip.Color(255, 0, 0);
     }
     else
     {
-      byte bytes[] = {0, 0, 255};
-      return bytes;
+      return strip.Color(0, 0, 255);
     }
   }
   else
   {
-    byte bytes[] = {220, 20, 60};
-    return bytes;
+    return strip.Color(0, 255, 255);
   }
 }
 
-byte* getOffColor()
+uint32_t getOffColor()
 {
-  if (IS_ROBOT_FOR_COMPETITION)
-  {
-    byte bytes[] = {32, 32, 32};
-    return bytes;
-  }
-  else
-  {
-    byte bytes[] = {192, 192, 192};
-    return bytes;
-  }
+  return strip.Color(0, 0, 0);
 }
 
 uint32_t colorLerp(byte* start, byte* finish, float t)
@@ -398,7 +247,7 @@ byte lerp(byte start, byte finish, float t)
 
 void ColorFade(byte* off, byte* on)
 {
-  for (int i = 0; i < strip.numPixels(); i++) strip.setPixelColor(i, getColor(off));
+  for (int i = 0; i < strip.numPixels(); i++) strip.setPixelColor(i, getOffColor());
   for (double q = 0; q <= 1; q += 1.0f / 30.0f)
   {
     for (int i = 0; i < strip.numPixels(); i++)
@@ -458,3 +307,4 @@ byte* WheelBytes(uint16_t WheelPos)
   byte bytes[] = {r, g, b};
   return bytes;
 }
+
