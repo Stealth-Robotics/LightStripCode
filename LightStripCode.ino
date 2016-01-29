@@ -88,7 +88,7 @@ void loop()
   else
   {
     //not competition. choose your most favorite effect(s)
-    RainbowFade();
+    RainbowWipe();
   }
 }
 
@@ -146,27 +146,25 @@ int loopI(int i)
   return i;
 }
 
-void TheaterCrawl()
+void RainbowWipe()
 {
-  uint32_t color = getColor(255,0,0);
   uint32_t offColor = getColor(0,0,0);
   for (int i = 0; i < strip.numPixels(); i++)
   {
     strip.setPixelColor(i, offColor);
   }
   strip.show();
-  for (int q = 0; q < 3; q++)
+  for (int i = 0; i < strip.numPixels(); i++)
   {
-    for (int i = 0; i < strip.numPixels(); i += 3)
-    {
-      strip.setPixelColor(i + q, color);    //turn every third pixel on
-    }
+    strip.setPixelColor(i, Wheel(i * 384 / strip.numPixels()));
     strip.show();
-    delay(250);
-    for (int i = 0; i < strip.numPixels(); i += 3)
-    {
-      strip.setPixelColor(i + q, offColor);        //turn every third pixel off
-    }
+    delay(25);
+  }
+  for (int i = 0; i < strip.numPixels(); i++)
+  {
+    strip.setPixelColor(i, offColor);
+    strip.show();
+    delay(25);
   }
 }
 
@@ -190,6 +188,30 @@ void ColorWipe()
     strip.setPixelColor(i, offColor);
     strip.show();
     delay(25);
+  }
+}
+
+void TheaterCrawl()
+{
+  uint32_t color = getColor(255,0,0);
+  uint32_t offColor = getColor(0,0,0);
+  for (int i = 0; i < strip.numPixels(); i++)
+  {
+    strip.setPixelColor(i, offColor);
+  }
+  strip.show();
+  for (int q = 0; q < 3; q++)
+  {
+    for (int i = 0; i < strip.numPixels(); i += 3)
+    {
+      strip.setPixelColor(i + q, color);    //turn every third pixel on
+    }
+    strip.show();
+    delay(250);
+    for (int i = 0; i < strip.numPixels(); i += 3)
+    {
+      strip.setPixelColor(i + q, offColor);        //turn every third pixel off
+    }
   }
 }
 
