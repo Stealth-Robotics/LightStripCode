@@ -7,7 +7,7 @@
 /*****************************************************************************/
 
 // Number of RGB LEDs in strand:
-int nLEDs = 24;
+int nLEDs = 16;
 
 // Chose 2 pins for output; can be any valid output pins:
 int dataPin  = 2;
@@ -88,7 +88,7 @@ void loop()
   else
   {
     //not competition. choose your most favorite effect(s)
-    RainbowWipe();
+    Solid(0, 255, 0);
   }
 }
 
