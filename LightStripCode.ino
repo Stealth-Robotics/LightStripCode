@@ -10,7 +10,7 @@
 int nLEDs = 16;
 
 // Chose 2 pins for output; can be any valid output pins:
-int dataPin  = 2;
+int dataPin = 6;
 //int clockPin = 3;
 
 const bool IS_ROBOT_FOR_COMPETITION = false;
